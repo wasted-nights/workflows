@@ -1,6 +1,9 @@
 name: PTT Scraper
 
-on: []  # 這會使得此工作流程不會被任何事件觸發
+on:
+  schedule:
+    - cron: '0 * * * *'  # 每小時運行一次
+  workflow_dispatch:  # 允許手動觸發工作流
 
 jobs:
   run-scraper:

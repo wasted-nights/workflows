@@ -3,28 +3,26 @@ from bs4 import BeautifulSoup
 import os
 from datetime import datetime
 import time
-import urllib3
+import random
 
-# 禁用不安全請求警告
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+# 更多 User-Agent 選項
+USER_AGENTS = [
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36',
+    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.107 Safari/537.36'
+]
 
 # 讀取 LINE Notify Token
 token = os.getenv('LINE_NOTIFY_TOKEN')
 
-# 更新 headers 以模擬瀏覽器並繞過驗證
+# 隨機選擇 User-Agent
 headers = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+    'User-Agent': random.choice(USER_AGENTS),
     'Referer': 'https://www.ptt.cc/bbs/Drama-Ticket/index.html',
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-    'Accept-Encoding': 'gzip, deflate, br',
-    'Accept-Language': 'en-US,en;q=0.9',
-    'Connection': 'keep-alive',
-    'Cookie': 'over18=1'  # 繞過 18 歲限制
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*',
+    'Accept-Language': 'zh-TW,zh;q=0.8,en-US;q=0.5,en;q=0.3',
+    'Cookie': 'over18=1'
 }
-
-# 建立一個 session 來保持會話
-session = requests.Session()
-session.headers.update(headers)
 
 # PTT 看板 URL
 url = 'https://www.ptt.cc/bbs/Drama-Ticket/index.html'
@@ -62,17 +60,12 @@ def fetch_ptt_titles(max_retries=3):
     
     for attempt in range(max_retries):
         try:
-            # 使用 verify=False 忽略 SSL 驗證
-            response = session.get(url, verify=False, timeout=10)
+            # 直接使用 requests.get()
+            response = requests.get(url, headers=headers, timeout=10)
             
             print(f"HTTP 狀態碼: {response.status_code}")
             
             if response.status_code == 200:
-                # 檢查是否有驗證碼
-                if '驗證碼' in response.text:
-                    print("❌ 遇到驗證碼，需要手動處理")
-                    return
-                
                 soup = BeautifulSoup(response.text, 'html.parser')
                 articles = soup.find_all('div', class_='r-ent')
                 

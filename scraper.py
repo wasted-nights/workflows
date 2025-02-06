@@ -6,7 +6,13 @@ import time
 
 # 讀取 LINE Notify Token
 token = os.getenv('LINE_NOTIFY_TOKEN')
-headers = {'Authorization': f'Bearer {token}'}
+headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+    'Accept-Encoding': 'gzip, deflate, br',
+    'Accept-Language': 'en-US,en;q=0.9',
+    'Connection': 'keep-alive'
+}
 
 # PTT 看板 URL
 url = 'https://www.ptt.cc/bbs/Drama-Ticket/index.html'
@@ -43,7 +49,7 @@ def fetch_ptt_titles():
     print("===== 開始爬取 PTT =====")
 
     # 模擬瀏覽器請求
-    response = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'})
+    response = requests.get(url, headers=headers)
     print(f"HTTP 狀態碼: {response.status_code}")
 
     if response.status_code != 200:

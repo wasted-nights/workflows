@@ -8,17 +8,22 @@ import time
 token = os.getenv('LINE_NOTIFY_TOKEN')
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+    'Referer': 'https://www.ptt.cc/bbs/Drama-Ticket/index.html',  # 參考來源頁面
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
     'Accept-Encoding': 'gzip, deflate, br',
     'Accept-Language': 'en-US,en;q=0.9',
     'Connection': 'keep-alive'
 }
 
+# 建立一個 session 來保持會話
+session = requests.Session()
+session.headers.update(headers)
+
 # PTT 看板 URL
 url = 'https://www.ptt.cc/bbs/Drama-Ticket/index.html'
 
 # 設定關鍵字
-keywords = ['倉木', '角野']  # 這裡放上你要檢查的關鍵字
+keywords = ['倉木', '角野']
 
 # 設定日期篩選，僅處理 2025/02/06 之後的文章
 start_date = datetime(2025, 2, 6)
@@ -44,12 +49,11 @@ def save_processed_title(title):
     with open(processed_titles_file, 'a', encoding='utf-8') as file:
         file.write(title + '\n')  # 保存處理過的標題
 
-# 模擬瀏覽器請求的函式
+# 抓取 PTT 看板的文章標題
 def fetch_ptt_titles():
     print("===== 開始爬取 PTT =====")
 
-    # 模擬瀏覽器請求
-    response = requests.get(url, headers=headers)
+    response = session.get(url)  # 使用 session 發送請求
     print(f"HTTP 狀態碼: {response.status_code}")
 
     if response.status_code != 200:
@@ -93,9 +97,6 @@ def fetch_ptt_titles():
         print("❌ 沒有符合的關鍵字，這次沒有發送通知")
 
     print("===== 爬取 PTT 結束 =====")
-
-    # 每次發送請求後延遲 2 秒
-    time.sleep(2)
 
 # 執行爬取函式
 fetch_ptt_titles()

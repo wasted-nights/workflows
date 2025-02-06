@@ -20,8 +20,10 @@ headers = {
     'User-Agent': random.choice(USER_AGENTS),
     'Referer': 'https://www.ptt.cc/bbs/Drama-Ticket/index.html',
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*',
+    'Accept-Encoding': 'gzip, deflate, br',  # 添加接受編碼
     'Accept-Language': 'zh-TW,zh;q=0.8,en-US;q=0.5,en;q=0.3',
-    'Cookie': 'over18=1'
+    'Connection': 'keep-alive',  # 保持連接
+    'Cookie': 'over18=1'  # 設置過18歲的cookie
 }
 
 # PTT 看板 URL
@@ -61,7 +63,7 @@ def fetch_ptt_titles(max_retries=3):
     for attempt in range(max_retries):
         try:
             # 直接使用 requests.get()
-            response = requests.get(url, headers=headers, timeout=10)
+            response = requests.get(url, headers=headers, timeout=15)  # 延長 timeout
             
             print(f"HTTP 狀態碼: {response.status_code}")
             
@@ -100,7 +102,7 @@ def fetch_ptt_titles(max_retries=3):
                 
                 break  # 成功後跳出重試迴圈
             
-            time.sleep(2)  # 等待重試
+            time.sleep(random.uniform(3, 6))  # 隨機延遲 3 到 6 秒，避免過快的請求
         
         except Exception as e:
             print(f"❌ 第 {attempt+1} 次嘗試失敗: {e}")

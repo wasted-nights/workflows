@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import os
 from datetime import datetime
+import time
 
 # 讀取 LINE Notify Token
 token = os.getenv('LINE_NOTIFY_TOKEN')
@@ -37,10 +38,11 @@ def save_processed_title(title):
     with open(processed_titles_file, 'a', encoding='utf-8') as file:
         file.write(title + '\n')  # 保存處理過的標題
 
-# 抓取 PTT 看板的文章標題
+# 模擬瀏覽器請求的函式
 def fetch_ptt_titles():
     print("===== 開始爬取 PTT =====")
 
+    # 模擬瀏覽器請求
     response = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'})
     print(f"HTTP 狀態碼: {response.status_code}")
 
@@ -85,6 +87,9 @@ def fetch_ptt_titles():
         print("❌ 沒有符合的關鍵字，這次沒有發送通知")
 
     print("===== 爬取 PTT 結束 =====")
+
+    # 每次發送請求後延遲 2 秒
+    time.sleep(2)
 
 # 執行爬取函式
 fetch_ptt_titles()
